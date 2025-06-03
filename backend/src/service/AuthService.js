@@ -1,6 +1,7 @@
 const { UserModel } = require("../models/User.model");
 const ApiError = require("../utils/apiError");
 const bcryptjs = require("bcryptjs");
+const JWTService = require("../utils/JwtService");
 
 class AuthService {
   static async loginUser(body) {
@@ -14,9 +15,11 @@ class AuthService {
     if (!isMatch) {
       throw new ApiError(400, "Invalid Credentials");
     }
+
+    const token = JWTService.generateToken(check_exist._id);
     return {
       msg: "Login Success",
-      token: "123"
+      token: token
     };
   }
 
@@ -26,7 +29,7 @@ class AuthService {
     if (check_exist) {
       throw new ApiError(400, "Email Already Exist");
     }
-    const user = await UserModel.create({
+    await UserModel.create({
       name,
       email,
       password,
@@ -37,6 +40,16 @@ class AuthService {
       msg: "Register Success",
       token: "123"
     };
+  }
+
+  static async profileUser(user) {
+    const userd = await UserModel.findById(user).select(
+      "name email ac_type createdAt -_id"
+    );
+    if (!userd) {
+      throw new ApiError(401, "Profile Not Found");
+    }
+    return userd;
   }
 }
 
