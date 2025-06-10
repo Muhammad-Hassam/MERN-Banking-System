@@ -16,10 +16,9 @@ class AuthService {
       throw new ApiError(400, "Invalid Credentials");
     }
 
-    const token = JWTService.generateToken(check_exist._id);
     return {
       msg: "Login Success",
-      token: token
+      token: JWTService.generateToken(check_exist._id)
     };
   }
 
@@ -29,16 +28,15 @@ class AuthService {
     if (check_exist) {
       throw new ApiError(400, "Email Already Exist");
     }
-    await UserModel.create({
+    const user = await UserModel.create({
       name,
       email,
       password,
       ac_type
     });
-
     return {
       msg: "Register Success",
-      token: "123"
+      token: JWTService.generateToken(user._id)
     };
   }
 
