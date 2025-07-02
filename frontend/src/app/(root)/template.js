@@ -9,6 +9,7 @@ import { setIsToggle, SidebarSlicePath } from "@/redux/slice/slidebarSlice";
 import Link from "next/link";
 import { MdDashboard } from "react-icons/md";
 import { GiFalloutShelter } from "react-icons/gi";
+import { BsCoin } from "react-icons/bs";
 const RootTemplate = ({ children }) => {
   const { user } = useMainContext();
   const router = useRouter();
@@ -59,6 +60,7 @@ const RootTemplate = ({ children }) => {
         >
           <Menu className="!bg-white !min-h-screen lg:!min-h-[100vh]">
             <CustomMenu link={"/"} text={"Home"} Icon={MdDashboard} />
+            <CustomMenu link={"/amount"} text={"Amount"} Icon={BsCoin} />
             <CustomMenu
               link={"/profile"}
               text={"Profile"}
