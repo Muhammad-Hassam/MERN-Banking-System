@@ -6,8 +6,36 @@ import { IoClose } from "react-icons/io5";
 import { FaRupeeSign } from "react-icons/fa6";
 import { SiRazorpay } from "react-icons/si";
 import { Field, Formik } from "formik";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+
 export default function AddAmountModal() {
-  let [isOpen, setIsOpen] = useState(true);
+  let [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const initial_state = {
+    amount: 0
+  };
+
+  const validationSchema = yup.object({
+    amount: yup
+      .number()
+      .min(1, "Enter minimum amount 1 Pkr")
+      .required("Amount is required")
+  });
+
+  const onSubmitHandler = (values, { resetForm }) => {
+    try {
+      setLoading(true);
+      console.log(values);
+      toast.success("Amount added successfully");
+      setIsOpen(false);
+      resetForm();
+    } catch (error) {
+      toast.error(error?.response?.data?.msg || error?.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   function closeModal() {
     setIsOpen(false);
@@ -35,7 +63,6 @@ export default function AddAmountModal() {
           >
             <div className="fixed inset-0 bg-black/25" />
           </Transition.Child>
-
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-[50vh] items-center justify-center p-4 text-center">
               <Transition.Child
@@ -60,10 +87,16 @@ export default function AddAmountModal() {
                       <IoClose />
                     </button>
                   </Dialog.Title>
-
-                  <Formik>
-                    {({ values }) => {
-                      <form lassName="w-[96%] lg:w-[80%] mx-auto">
+                  <Formik
+                    validationSchema={validationSchema}
+                    initialValues={initial_state}
+                    onSubmit={onSubmitHandler}
+                  >
+                    {({ values, handleSubmit }) => (
+                      <form
+                        onSubmit={handleSubmit}
+                        className="w-[96%] lg:w-[80%] mx-auto"
+                      >
                         <div className="mb-3 flex items-center gap-x-2 px-2 border w-full rounded mt-3">
                           <FaRupeeSign className="text-2xl" />{" "}
                           <Field
@@ -80,13 +113,17 @@ export default function AddAmountModal() {
                           />
                         </div>
                         <div className="mb-3 flex w-full justify-end ">
-                          <button className="px-3 flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 text-white rounded">
+                          <button
+                            disabled={values?.amount < 1 || loading}
+                            className="px-3 flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300 text-white rounded"
+                            loading={loading}
+                          >
                             <span>Pay</span>
                             <SiRazorpay />
                           </button>
                         </div>
-                      </form>;
-                    }}
+                      </form>
+                    )}
                   </Formik>
                 </Dialog.Panel>
               </Transition.Child>
